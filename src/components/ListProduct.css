@@ -1,0 +1,16 @@
+.container {
+    display: flex;
+    gap: 20px;
+}
+
+.left {
+    flex: 7;
+    padding: 10px;
+}
+
+.right {
+    flex: 3;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-left: 1px solid #ccc;
+}
