@@ -1,154 +1,305 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import "./ListProduct.css";
 
 export default function ListProduct() {
+    // State lưu danh sách sản phẩm và danh mục
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [categorySelected, setCategorySelected] = useState(null);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [editingProduct, setEditingProduct] = useState(null); // thêm state để sửa sản phẩm
+    const [categorySelected, setCategorySelected] = useState("");
 
+    // State cho sản phẩm mới khi thêm
+    const [newProduct, setNewProduct] = useState({
+        title: "",
+        category: "",
+        price: "",
+    });
+
+    // State cho sản phẩm đang được chọn để hiện đánh giá
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    // State cho đánh giá mới
+    const [newReview, setNewReview] = useState({
+        reviewerName: "",
+        comment: "",
+        rating: 5,
+    });
+
+    // State cho sản phẩm đang chỉnh sửa
+    const [editingProduct, setEditingProduct] = useState(null);
+
+    // Load danh sách sản phẩm khi component được mount
     useEffect(() => {
         loadProducts();
     }, []);
 
+    // Gọi API để lấy dữ liệu sản phẩm
     function loadProducts() {
-        axios.get("http://localhost:9999/products").then((response) => {
-            const list = response.data;
-            const listCategories = [...new Set(list.map((product) => product.category))];
-            setProducts(list);
-            setCategories(listCategories);
-        });
+        axios.get("http://localhost:9999/products")
+            .then((res) => {
+                const list = res.data;
+                setProducts(list);
+                // Lấy danh sách category duy nhất
+                const cats = [...new Set(list.map((p) => p.category))];
+                setCategories(cats);
+            })
+            .catch((err) => {
+                console.error("Lỗi load products:", err);
+                alert("Không thể tải sản phẩm.");
+            });
     }
 
+    // Lọc sản phẩm theo category đang chọn
     function filterProducts() {
         if (!categorySelected) return products;
-        return products.filter((product) => product.category === categorySelected);
+        return products.filter((p) => p.category === categorySelected);
     }
 
-    function handleProductClick(product) {
-        setSelectedProduct(product);
-    }
+    // Thêm sản phẩm mới
+    function handleAddProduct() {
+        if (!(newProduct.title && newProduct.category && newProduct.price)) {
+            return alert("Nhập đủ thông tin!");
+        }
 
-    function handleEdit(product) {
-        setEditingProduct(product); // mở form sửa ở cột bên phải
-    }
-
-    function handleInputChange(e) {
-        const { name, value } = e.target;
-        setEditingProduct(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    }
-
-    function handleSaveEdit() {
-        axios.put(`http://localhost:9999/products/${editingProduct.id}`, editingProduct)
+        axios.post("http://localhost:9999/products", {
+            ...newProduct,
+            price: parseFloat(newProduct.price),
+            reviews: [], // thêm mảng đánh giá rỗng
+        })
             .then(() => {
                 loadProducts();
-                setEditingProduct(null);
+                // Reset lại form
+                setNewProduct({title: "", category: "", price: ""});
+            })
+            .catch((e) => {
+                console.error("Lỗi thêm product:", e);
+                alert("Thêm thất bại.");
             });
+    }
+
+    // Xoá sản phẩm theo ID
+    function handleDeleteProduct(id) {
+        if (!window.confirm("Xóa sản phẩm này?")) return;
+
+        axios.delete(`http://localhost:9999/products/${id}`)
+            .then(() => {
+                // Nếu đang xem chi tiết sản phẩm bị xóa thì ẩn nó đi
+                if (selectedProduct?.id === id) setSelectedProduct(null);
+                loadProducts();
+            })
+            .catch((e) => {
+                console.error("Lỗi xóa:", e);
+                alert("Xóa thất bại.");
+            });
+    }
+
+    // Khi click vào sản phẩm => toggle đánh giá (hiện hoặc ẩn)
+    function handleSelectProduct(product) {
+        if (selectedProduct && selectedProduct.id === product.id) {
+            // Nếu đang mở sản phẩm đó => đóng lại
+            setSelectedProduct(null);
+        } else {
+            // Mở sản phẩm đó và reset form đánh giá
+            setSelectedProduct(product);
+            setNewReview({reviewerName: "", comment: "", rating: 5});
+        }
+    }
+
+    // Xử lý thay đổi trong form đánh giá
+    function handleReviewChange(e) {
+        const {name, value} = e.target;
+        setNewReview((prev) => ({...prev, [name]: value}));
+    }
+
+    // Gửi đánh giá mới lên API
+    async function handleSubmitReview() {
+        if (!(newReview.reviewerName && newReview.comment)) {
+            return alert("Nhập tên và nội dung đánh giá!");
+        }
+
+        const updated = {
+            ...selectedProduct,
+            reviews: [
+                ...(selectedProduct.reviews || []),
+                {
+                    ...newReview,
+                    date: new Date().toISOString(),
+                },
+            ],
+        };
+
+        try {
+            await axios.put(`http://localhost:9999/products/${selectedProduct.id}`, updated);
+            loadProducts();
+            setSelectedProduct(null);
+        } catch (e) {
+            console.error("Review error:", e);
+            alert("Gửi không thành công.");
+        }
+    }
+
+    // Mở form chỉnh sửa sản phẩm
+    function handleEdit(product) {
+        setEditingProduct(product);
+    }
+
+    // Xử lý khi thay đổi nội dung trong form edit
+    function handleEditChange(e) {
+        const {name, value} = e.target;
+        setEditingProduct((prev) => ({...prev, [name]: value}));
+    }
+
+    // Lưu lại sản phẩm sau khi chỉnh sửa
+    async function handleSaveEdit() {
+        try {
+            await axios.put(`http://localhost:9999/products/${editingProduct.id}`, editingProduct);
+            loadProducts();
+            setEditingProduct(null);
+        } catch (e) {
+            console.error("Save error:", e);
+            alert("Lưu không thành công.");
+        }
     }
 
     return (
         <div className="container">
-            {/* Left: 7 phần */}
+            {/* KHỐI TRÁI */}
             <div className="left">
-                <h1>List Product</h1>
+                <h1>Danh sách sản phẩm</h1>
 
-                <div>
-                    <button onClick={() => {
-                        setCategorySelected(null);
-                        setSelectedProduct(null);
-                    }}>
-                        All
-                    </button>
-                    {categories.map((category, index) => (
-                        <button key={index} onClick={() => {
-                            setCategorySelected(category);
-                            setSelectedProduct(null);
-                        }}>
-                            {category}
-                        </button>
+                {/* Nút lọc theo danh mục */}
+                <div className="category-buttons">
+                    <button onClick={() => setCategorySelected("")}>All</button>
+                    {categories.map((c, idx) => (
+                        <button key={idx} onClick={() => setCategorySelected(c)}>{c}</button>
                     ))}
                 </div>
 
-                <div style={{ marginTop: "20px" }}>
-                    {filterProducts().map((product) => (
+                {/* Form thêm sản phẩm mới */}
+                <div className="add-product-form">
+                    <h2>Add Product</h2>
+                    <input
+                        type="text"
+                        placeholder="Title"
+                        value={newProduct.title}
+                        onChange={(e) => setNewProduct({...newProduct, title: e.target.value})}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Category"
+                        value={newProduct.category}
+                        onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Price"
+                        value={newProduct.price}
+                        onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                    />
+                    <button className="add-product-btn" onClick={handleAddProduct}>
+                        Add Product
+                    </button>
+                </div>
+
+                {/* Danh sách sản phẩm */}
+                <div className="product-list">
+                    {filterProducts().map((p) => (
                         <div
-                            key={product.id}
-                            onClick={() => handleProductClick(product)}
-                            style={{
-                                border: "1px solid #ccc",
-                                padding: "10px",
-                                margin: "10px 0",
-                                cursor: "pointer"
-                            }}
+                            key={p.id}
+                            className="product-item"
+                            onClick={() => handleSelectProduct(p)}
                         >
-                            <strong>{product.title}</strong> - {product.category} - ${product.price}
-                            <button style={{ float: "right" }} onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(product);
-                            }}>
-                                Edit
+                            <strong>{p.title}</strong> - {p.category} - ${p.price}
+                            <button onClick={(e) => {
+                                e.stopPropagation(); // tránh trigger chọn sản phẩm
+                                handleEdit(p);
+                            }}>Edit
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteProduct(p.id);
+                                }}
+                                className="delete"
+                            >
+                                Delete
                             </button>
                         </div>
                     ))}
                 </div>
 
+                {/* Hiển thị đánh giá nếu chọn sản phẩm */}
                 {selectedProduct && (
-                    <div style={{ marginTop: "30px" }}>
-                        <h2>Reviews for: {selectedProduct.title}</h2>
-                        {selectedProduct.reviews && selectedProduct.reviews.length > 0 ? (
+                    <div className="review-form">
+                        <h2>Đánh giá: {selectedProduct.title}</h2>
+
+                        {/* Danh sách đánh giá cũ */}
+                        {selectedProduct.reviews?.length > 0 && (
                             <ul>
-                                {selectedProduct.reviews.map((review, index) => (
-                                    <li key={index} style={{ marginBottom: "10px" }}>
-                                        <strong>{review.reviewerName}</strong> ({new Date(review.date).toLocaleDateString()}):<br />
-                                        <em>"{review.comment}"</em><br />
-                                        ⭐ {review.rating}/5
+                                {selectedProduct.reviews.map((r, i) => (
+                                    <li key={i}>
+                                        <strong>{r.reviewerName}</strong> ({new Date(r.date).toLocaleDateString()}):
+                                        <em> "{r.comment}"</em> ⭐️ {r.rating}
                                     </li>
                                 ))}
                             </ul>
-                        ) : (
-                            <p>Không có đánh giá nào.</p>
                         )}
+
+                        {/* Form thêm đánh giá */}
+                        <h3>Thêm đánh giá mới</h3>
+                        <input
+                            name="reviewerName"
+                            placeholder="Tên người đánh giá"
+                            value={newReview.reviewerName}
+                            onChange={handleReviewChange}
+                        />
+                        <textarea
+                            name="comment"
+                            placeholder="Nội dung đánh giá"
+                            value={newReview.comment}
+                            onChange={handleReviewChange}
+                        />
+                        <select
+                            name="rating"
+                            value={newReview.rating}
+                            onChange={handleReviewChange}
+                        >
+                            {[1, 2, 3, 4, 5].map((n) => (
+                                <option key={n} value={n}>{n}</option>
+                            ))}
+                        </select>
+                        <button onClick={handleSubmitReview}>Gửi đánh giá</button>
                     </div>
                 )}
             </div>
 
-            {/* Right: 3 phần */}
+            {/* KHỐI PHẢI: Form chỉnh sửa sản phẩm */}
             <div className="right">
                 {editingProduct && (
                     <>
                         <h2>Edit Product</h2>
-                        <div>
-                            <label>Title:</label><br />
-                            <input
-                                type="text"
-                                name="title"
-                                value={editingProduct.title}
-                                onChange={handleInputChange}
-                            /><br />
-
-                            <label>Category:</label><br />
-                            <input
-                                type="text"
-                                name="category"
-                                value={editingProduct.category}
-                                onChange={handleInputChange}
-                            /><br />
-
-                            <label>Price:</label><br />
-                            <input
-                                type="number"
-                                name="price"
-                                value={editingProduct.price}
-                                onChange={handleInputChange}
-                            /><br /><br />
-
+                        <label>Title</label>
+                        <input
+                            name="title"
+                            value={editingProduct.title}
+                            onChange={handleEditChange}
+                        />
+                        <label>Category</label>
+                        <input
+                            name="category"
+                            value={editingProduct.category}
+                            onChange={handleEditChange}
+                        />
+                        <label>Price</label>
+                        <input
+                            name="price"
+                            type="number"
+                            value={editingProduct.price}
+                            onChange={handleEditChange}
+                        />
+                        <div className="button-group">
                             <button onClick={handleSaveEdit}>Save</button>
-                            <button onClick={() => setEditingProduct(null)} style={{ marginLeft: "10px" }}>
+                            <button className="cancel" onClick={() => setEditingProduct(null)}>
                                 Cancel
                             </button>
                         </div>

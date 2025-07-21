@@ -3,7 +3,7 @@
     {
       "id": "1",
       "title": "Essence Mascara Lash",
-      "category": "beauty",
+      "category": "Beauty",
       "price": 9.99,
       "reviews": [
         {
@@ -35,13 +35,19 @@
           "comment": "qưeqw",
           "rating": 1,
           "date": "2025-03-22T04:52:54.720Z"
+        },
+        {
+          "reviewerName": "Đạt",
+          "comment": "Sản phẩm quá oke",
+          "rating": 5,
+          "date": "2025-07-19T02:12:30.943Z"
         }
       ]
     },
     {
       "id": "2",
       "title": "Eyeshadow Palette with",
-      "category": "beauty",
+      "category": "Beauty",
       "price": 19.99,
       "reviews": [
         {
@@ -55,7 +61,7 @@
     {
       "id": "3",
       "title": "Powder Canister",
-      "category": "beauty",
+      "category": "Beauty",
       "price": 14.99,
       "reviews": [
         {
@@ -87,7 +93,7 @@
     {
       "id": "4",
       "title": "Red Lipstick",
-      "category": "beauty",
+      "category": "Beauty",
       "price": 12.99,
       "reviews": [
         {
@@ -107,7 +113,7 @@
     {
       "id": "5",
       "title": "Red Nail Polish",
-      "category": "beauty",
+      "category": "Beauty",
       "price": 8.99,
       "reviews": [
         {
@@ -133,7 +139,7 @@
     {
       "id": "6",
       "title": "Calvin Klein CK One",
-      "category": "fragrances",
+      "category": "Fragrances",
       "price": 49.99,
       "reviews": [
         {
@@ -159,7 +165,7 @@
     {
       "id": "7",
       "title": "Chanel Coco Noir Eau",
-      "category": "fragrances",
+      "category": "Fragrances",
       "price": 129.99,
       "reviews": [
         {
@@ -185,7 +191,7 @@
     {
       "id": "8",
       "title": "Dior J'adore",
-      "category": "fragrances",
+      "category": "Fragrances",
       "price": 89.99,
       "reviews": [
         {
@@ -217,7 +223,7 @@
     {
       "id": "9",
       "title": "Dolce Shine Eau de",
-      "category": "fragrances",
+      "category": "Fragrances",
       "price": 69.99,
       "reviews": [
         {
@@ -242,17 +248,10 @@
     },
     {
       "title": "Dior Savauge",
-      "category": "fragrances",
+      "category": "Fragrances",
       "price": 49.99,
       "reviews": [],
       "id": "15KDmRB"
-    },
-    {
-      "title": "Jacket",
-      "category": "clothes",
-      "price": "90.99",
-      "reviews": [],
-      "id": "Dr5aBxo"
     }
   ]
 }

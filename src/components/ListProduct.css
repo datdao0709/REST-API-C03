@@ -1,16 +1,215 @@
+/* --- CONTAINER CHUNG CHO TRANG --- */
 .container {
     display: flex;
-    gap: 20px;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1200px;
+    margin: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* --- PHẦN TRÁI: HIỂN THỊ DANH SÁCH SẢN PHẨM --- */
 .left {
     flex: 7;
-    padding: 10px;
+    padding: 16px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* --- PHẦN PHẢI: FORM THÊM SẢN PHẨM --- */
 .right {
     flex: 3;
-    padding: 10px;
-    background-color: #f9f9f9;
+    padding: 20px;
+    background-color: #ffffff;
     border-left: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.right label {
+    font-weight: 600;
+    margin-top: 12px;
+    display: block;
+    color: #333;
+}
+
+.right input,
+.right select,
+.right textarea {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* --- NHÓM BUTTON TRONG FORM THÊM SẢN PHẨM --- */
+.right .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.right button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.right button.cancel {
+    background-color: #6c757d;
+}
+
+.right button:hover {
+    background-color: #0056b3;
+}
+
+.right button.cancel:hover {
+    background-color: #5a6268;
+}
+
+/* --- BUTTON "THÊM SẢN PHẨM" Ở TRÊN DANH SÁCH --- */
+.add-product-btn {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.add-product-btn:hover {
+    background-color: #0056b3;
+}
+
+.add-product-btn:active {
+    transform: scale(0.97);
+    background-color: #004a99;
+}
+
+/* --- MỖI ITEM SẢN PHẨM --- */
+.product-item {
+    border: 1px solid #ccc;
+    padding: 12px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 6px;
+    position: relative;
+    background: #fdfdfd;
+}
+
+.product-item button {
+    float: right;
+    margin-left: 10px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #e9ecef;
+    color: #333;
+}
+
+/* --- BUTTON XÓA SẢN PHẨM --- */
+.product-item button.delete {
+    color: red;
+    background-color: #f8d7da;
+}
+
+.product-item button.delete:hover {
+    background-color: #f5c6cb;
+}
+
+/* --- BUTTON CHỌN THEO CATEGORY --- */
+.category-buttons button {
+    margin-right: 8px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #dee2e6;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.category-buttons button:hover {
+    background-color: #ced4da;
+}
+
+/* --- FORM NHẬP SẢN PHẨM --- */
+.add-product-form input {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* --- FORM ĐÁNH GIÁ SẢN PHẨM --- */
+.review-form {
+    margin-top: 24px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 500px;
+}
+
+.review-form h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.review-form label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.review-form input,
+.review-form textarea,
+.review-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.review-form button {
+    padding: 10px 16px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: fit-content;
+}
+
+.review-form button:hover {
+    background-color: #218838;
 }
